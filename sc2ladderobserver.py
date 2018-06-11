@@ -6,6 +6,10 @@ import os
 import glob
 
 script_path = os.path.dirname(os.path.abspath( __file__ ))
+temp_path = (script_path + '\\temp\\')
+
+if not os.path.exists(temp_path):
+	os.makedirs(temp_path)
 
 website = 'http://107.161.27.148'
 api = '/api/game_results'
@@ -23,7 +27,7 @@ def startbattle():
 	winner_name = battle['winner_name']
 	replay = battle['replay']
 	replayfile = str(website) + str(replay)
-	replaysave = script_path + '\\temp\\' + str(battleid) + ".Sc2Replay"
+	replaysave = temp_path + str(battleid) + ".Sc2Replay"
 	
 	bot_1_authorname = battle['bots'][0]['author']
 	bot_1_botname = battle['bots'][0]['name']
@@ -75,7 +79,7 @@ def startbattle():
 	os.system("ExampleObserver.exe --Path \"" + replaysave + "\"")
 	
 	# delete temp files
-	tempfilelist = glob.glob(os.path.join((script_path + "\\temp\\"), "*.*"))
+	tempfilelist = glob.glob(os.path.join(temp_path, "*.*"))
 	for tempfile in tempfilelist:
 		os.remove(tempfile)
 
