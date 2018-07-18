@@ -14,12 +14,26 @@ if not os.path.exists(temp_path):
 website = 'http://107.161.27.148'
 api = '/api/game_results'
 
+already_visited = []
+
 def startbattle():
 	# get results from API
 	r = requests.get(website + api)
 	r.text
 	data = json.loads(r.text)
-	battle = random.choice(data)
+	
+	# results are ordered by match id from lowest to highest.
+	# we always want to show the game with the highest id that
+	# has not been shown already.
+	# If there is no new games, reset.
+	found_new_game = False
+	for battle in reversed(data):
+		if battle['id'] not in already_visited:
+			already_visited.append(battle['id'])
+			found_new_game = True;
+			break
+	if not found_new_game:
+		already_visited.clear()
 
 	# define a few vars for easier handling
 	battleid = battle['id']
