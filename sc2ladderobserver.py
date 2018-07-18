@@ -34,6 +34,7 @@ def startbattle():
 			break
 	if not found_new_game:
 		already_visited.clear()
+		return
 
 	# define a few vars for easier handling
 	battleid = battle['id']

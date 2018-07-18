@@ -17,18 +17,29 @@ if not os.path.exists(temp_path):
 website = 'https://sc2ai.net/'
 api = 'game_results.php'
 
+already_visited = []
+
 def startbattle():
 	# get results from API
 	r = requests.get(website + api, verify=False)
 	r.text
 	data = json.loads(r.text)
-	battle = random.choice(data)
-	lastid = int(data[0]['id'])
+	
+	# we always want to show the game with the highest id that
+	# has not been shown already.
+	# If there is no new games, reset.
+	found_new_game = False
+	for battle in data:
+		if battle['id'] not in already_visited:
+			already_visited.append(battle['id'])
+			found_new_game = True;
+			break
+	if not found_new_game:
+		already_visited.clear()
+		return
 
 	# define a few vars for easier handling
 	battleid = int(battle['id'])
-	if battleid < (lastid - 100):
-		return
 	map = battle['map']
 	winner_name = battle['winner_name']
 	replay = battle['replay']
