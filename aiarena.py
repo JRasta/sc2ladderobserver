@@ -3,20 +3,27 @@ import json
 import urllib.request, urllib.error
 import os
 import glob
+import time
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 temp_path = (script_path + '\\temp\\')
+statefile = ("state.txt")
 
 if not os.path.exists(temp_path):
     os.makedirs(temp_path)
 
-token = 'redacted'
+token = 'apitoken'
 
 already_visited = []
 
 
 def startbattle():
-    # get results from API
+    # delete temp files
+    #tempfilelist = glob.glob(os.path.join(temp_path, "*.*"))
+    #for tempfile in tempfilelist:
+    #    os.remove(tempfile)
+
+	# get results from API
     r = requests.get('https://ai-arena.net/api/results/?ordering=-created', headers={'Authorization': "Token " + token})
     r.text
     data = json.loads(r.text)
@@ -39,6 +46,23 @@ def startbattle():
     battleid = battle['id']
     winner = battle['winner']
     replayfile = str(battle['replay_file'])
+    if replayfile == "None":
+        return
+
+    # We dont want to show Tie Games
+    if battle['duration'] >= 60480:
+        return
+
+    print(str(battle['bot1_name'] + " vs " + str(battle['bot2_name'])))
+
+    if os.path.isfile(statefile):
+        os.remove(statefile)	
+    f=open(statefile, "a+")
+    f.write("Game: " + str(battleid) + "\n")
+    f.write("Red:  " + str(battle['bot1_name']) + "\n")
+    f.write("Blue: " + str(battle['bot2_name']) + "\n")
+    f.close()
+		
     replaysave = temp_path + str(battleid) + ".Sc2Replay"
 
     # download replay
@@ -52,15 +76,15 @@ def startbattle():
     print("----------\n")
     print("Winner: " + str(winner))
 
+    # rename bots
+    if 'bot1_name' in battle:
+        print("BotReplayRename.exe \"" + replaysave + "\"" + " foo5679 " + battle['bot1_name'] + " foo5680 " + battle['bot2_name'])
+        os.system("BotReplayRename.exe \"" + replaysave + "\"" + " foo5679 " + battle['bot1_name'] + " foo5680 " + battle['bot2_name'])
+
     # run Observer
     os.system("ExampleObserver.exe --Path \"" + replaysave + "\"")
 
-    # delete temp files
-    tempfilelist = glob.glob(os.path.join(temp_path, "*.*"))
-    for tempfile in tempfilelist:
-        os.remove(tempfile)
-
 # Main Loop
 while True:
-    os.system('cls')
+    #os.system('cls')
     startbattle()
