@@ -59,8 +59,6 @@ def startbattle():
         os.remove(statefile)	
     f=open(statefile, "a+")
     f.write("Game: " + str(battleid) + "\n")
-    f.write("Red:  " + str(battle['bot1_name']) + "\n")
-    f.write("Blue: " + str(battle['bot2_name']) + "\n")
     f.close()
 		
     replaysave = temp_path + str(battleid) + ".Sc2Replay"
